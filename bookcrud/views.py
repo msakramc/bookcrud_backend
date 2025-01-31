@@ -60,12 +60,16 @@ class BookViewSet(generics.ListAPIView):
                 book = Book.objects.get(id=book_id)
             except Book.DoesNotExist:
                 return Response({"detail": "Book not found."}, status=status.HTTP_404_NOT_FOUND)
-            favourite_instance = Favourite.objects.get(id=FavId)
-            if UserFavouriteList.objects.filter(book__id=book_id).exists():
-                UserFavouriteList.objects.filter(book__id=book_id).update(favourite=favourite_instance)
+            if FavId == "0":
+                if UserFavouriteList.objects.filter(book__id=book_id).exists():
+                    UserFavouriteList.objects.get(book__id=book_id).delete()
             else:
-                book_instance = Book.objects.get(id=book_id)
-                UserFavouriteList.objects.create(book=book_instance,favourite=favourite_instance)
+                favourite_instance = Favourite.objects.get(id=FavId)
+                if UserFavouriteList.objects.filter(book__id=book_id).exists():
+                    UserFavouriteList.objects.filter(book__id=book_id).update(favourite=favourite_instance)
+                else:
+                    book_instance = Book.objects.get(id=book_id)
+                    UserFavouriteList.objects.create(book=book_instance,favourite=favourite_instance)
             return Response(status=status.HTTP_200_OK)
         elif book_id and not FavId:
             try:
